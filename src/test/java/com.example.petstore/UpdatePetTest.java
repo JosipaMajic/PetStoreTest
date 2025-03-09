@@ -38,25 +38,33 @@ public class UpdatePetTest {
         ExtentReportUtil.flushReports();
     }
 
-    @Test
-    void updateExistingPet() {
-        test = extent.createTest("Update Existing Pet Test");
-        int petId = 123;
-
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Mammal");
-
-        Tag tag = new Tag();
-        tag.setId(1L);
-        tag.setName("rabbit");
+    private Pet createPet(String name, String status) {
+        Category category = new Category(1L, "Mammal");
+        Tag tag = new Tag("Mammal", 1L);
 
         Pet pet = new Pet();
         pet.setCategory(category);
-        pet.setName("MiffyUpdated");
+        pet.setName(name);
         pet.setPhotoUrls(List.of());
         pet.setTags(List.of(tag));
-        pet.setStatus("sold");
+        pet.setStatus(status);
+
+        return pet;
+    }
+
+    private Response sendPutRequest(Pet pet) {
+        return given()
+                .contentType(ContentType.JSON)
+                .header("api_key", ConfigReader.getApiKey())
+                .body(pet)
+                .when()
+                .put("/pet");
+    }
+
+    @Test
+    void updateExistingPet() {
+        test = extent.createTest("Update Existing Pet Test");
+        Pet pet = createPet("MiffyUpdated", "sold");
 
         test.info("Updating an existing pet with name: " + pet.getName());
         Response response = given()
@@ -86,26 +94,11 @@ public class UpdatePetTest {
     @Test
     void updateNonExistingPet() {
         test = extent.createTest("Update Non-Existing Pet Test");
-        long petId = -1L;
+        Pet pet = createPet("Fluffy", "available");
+        pet.setId(null);
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Mammal");
-
-        Tag tag = new Tag();
-        tag.setId(1L);
-        tag.setName("rabbit");
-
-        Pet pet = new Pet();
-        pet.setId(-1L);
-        pet.setCategory(category);
-        pet.setName("MiffyUpdated");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(tag));
-        pet.setStatus("sold");
-
-        logger.info("Updating a non-existing pet with ID: " + petId);
-        test.info("Updating a non-existing pet with ID: " + petId);
+        logger.info("Updating a non-existing pet with ID: ");
+        test.info("Updating a non-existing pet with ID: ");
         Response response = given()
                 .contentType(ContentType.JSON)
                 .header("api_key", ConfigReader.getApiKey())
@@ -124,25 +117,12 @@ public class UpdatePetTest {
     void updatePetWithNullId() {
         test = extent.createTest("Update Pet with Null ID Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Mammal");
-
-        Pet petWithNullId = new Pet();
-        petWithNullId.setCategory(category);
-        petWithNullId.setName("Fluffy");
-        petWithNullId.setPhotoUrls(List.of());
-        petWithNullId.setTags(List.of(new Tag("Mammal", 1L)));
-        petWithNullId.setStatus("available");
-        petWithNullId.setId(null);
+        Pet pet = createPet("Fluffy", "available");
+        pet.setId(null);
 
         logger.info("Updating pet with null ID");
-        Response responseWithNullId = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(petWithNullId)
-                .when()
-                .put("/pet");
+        Response responseWithNullId = sendPutRequest(pet);
+
 
         int statusCodeForNullId = responseWithNullId.getStatusCode();
         if (statusCodeForNullId == 405) {
@@ -159,28 +139,13 @@ public class UpdatePetTest {
     void updatePetWithInvalidStatus() {
         test = extent.createTest("Update Pet with Invalid Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Mammal");
+        Pet pet = createPet("MiffyUpdated", "invalidStatus");
+        test.info("Updating pet with invalid status");
 
-        Tag tag = new Tag();
-        tag.setId(1L);
-        tag.setName("rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("MiffyUpdated");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(tag));
-        pet.setStatus("invalidStatus");
+        Response response = sendPutRequest(pet);
 
         logger.info("Updating an existing pet with an invalid status: {}", pet.getStatus());
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+
 
         logger.info("Verifying response status code for invalid status");
         int statusCode = response.getStatusCode();
@@ -197,28 +162,10 @@ public class UpdatePetTest {
     void updatePetWithMissingName() {
         test = extent.createTest("Update Pet with Missing Name Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Mammal");
+        Pet pet = createPet(null, "available");
+        test.info("Updating pet with missing name");
 
-        Tag tag = new Tag();
-        tag.setId(1L);
-        tag.setName("rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(tag));
-        pet.setStatus("sold");
-        pet.setName(null);
-
-        logger.info("Updating an existing pet with missing name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
 
         logger.info("Verifying response status code for missing name");
         int statusCode = response.getStatusCode();
@@ -235,20 +182,11 @@ public class UpdatePetTest {
     void updatePetWithEmptyCategory() {
         test = extent.createTest("Update Pet with Empty Category Test");
 
-        Pet pet = new Pet();
+        Pet pet = createPet("Fluffy", "available");
         pet.setCategory(null);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
-        logger.info("Updating a pet with empty category");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        test.info("Updating a pet with empty category");
+        Response response = sendPutRequest(pet);
 
         logger.info("Verifying response status code for empty category");
         int statusCode = response.getStatusCode();
@@ -264,25 +202,11 @@ public class UpdatePetTest {
     void updatePetWithoutName() {
         test = extent.createTest("Update Pet without Name Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Tag tag = new Tag("Mammal", 1L);
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(tag));
-        pet.setStatus("available");
+        Pet pet = createPet("", "available");
 
         logger.info("Updating pet without name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
+
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -302,25 +226,11 @@ public class UpdatePetTest {
     void updatePetWithDuplicateName() {
         test = extent.createTest("Update Pet with Duplicate Name Field Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
+        Pet pet = createPet("Fluffy", "available");
         pet.setName("Fluffy");
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Updating pet with duplicate name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
 
         int statusCodeForDuplicateName = response.getStatusCode();
         if (statusCodeForDuplicateName == 400) {
@@ -338,24 +248,10 @@ public class UpdatePetTest {
     void updatePetWithNullStatus() {
         test = extent.createTest("Update Pet with Null Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Miffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus(null);
+        Pet pet = createPet("Miffy", null);
 
         logger.info("Updating pet with null status");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 405) {
@@ -375,26 +271,11 @@ public class UpdatePetTest {
     void updatePetWithExceedingNameLength() {
         test = extent.createTest("Update Pet with Exceeding Name Length Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
         String longName = "A".repeat(300);
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName(longName);
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
+        Pet pet = createPet(longName, "available");
 
         logger.info("Updating pet with a very long name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 405) {
