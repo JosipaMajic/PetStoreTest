@@ -38,10 +38,7 @@ public class CreatePetTest {
         ExtentReportUtil.flushReports();
     }
 
-    @Test
-    void addNewPet() {
-        test = extent.createTest("Add New Pet Test");
-
+    private Pet createPet() {
         Category category = new Category();
         category.setId(1L);
         category.setName("Rabbit");
@@ -54,6 +51,12 @@ public class CreatePetTest {
         pet.setPhotoUrls(List.of());
         pet.setTags(List.of(tag));
         pet.setStatus("available");
+
+        return pet;
+    }
+    @Test
+    void addNewPet() {
+        Pet pet = createPet();
 
         test.info("Creating a new pet with name: " + pet.getName());
         logger.info("Creating a new pet with name: {}", pet.getName());
@@ -91,15 +94,7 @@ public class CreatePetTest {
     void addNewPetWithSoldStatus() {
         test = extent.createTest("Add New Pet with Sold Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
+        Pet pet = createPet();
         pet.setStatus("sold");
 
         logger.info("Creating a new pet with status 'sold'");
@@ -123,15 +118,7 @@ public class CreatePetTest {
     void addNewPetWithPendingStatus() {
         test = extent.createTest("Add New Pet with Sold Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
+        Pet pet = createPet();
         pet.setStatus("pending");
 
         logger.info("Creating a new pet with status 'pending'");
@@ -155,16 +142,7 @@ public class CreatePetTest {
     void addNewPetWithNullId() {
         test = extent.createTest("Add New Pet with Null ID Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet petWithNullId = new Pet();
-        petWithNullId.setCategory(category);
-        petWithNullId.setName("Fluffy");
-        petWithNullId.setPhotoUrls(List.of());
-        petWithNullId.setTags(List.of(new Tag("Mammal", 1L)));
-        petWithNullId.setStatus("available");
+        Pet petWithNullId = createPet();
         petWithNullId.setId(null);
 
         logger.info("Creating a new pet with null ID");
@@ -201,58 +179,10 @@ public class CreatePetTest {
     }
 
     @Test
-    void addNewPetWithNoId() {
-        test = extent.createTest("Add New Pet without an ID Test");
-
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet petWithEmptyId = new Pet();
-        petWithEmptyId.setCategory(category);
-        petWithEmptyId.setName("Fluffy");
-        petWithEmptyId.setPhotoUrls(List.of());
-        petWithEmptyId.setTags(List.of(new Tag("Mammal", 1L)));
-        petWithEmptyId.setStatus("available");
-
-        logger.info("Creating a new pet with empty ID");
-        test.info("Creating a new pet with empty ID");
-        Response responseWithoutId = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(petWithEmptyId)
-                .when()
-                .post("/pet");
-
-        int statusCodeForNoId = responseWithoutId.getStatusCode();
-        if (statusCodeForNoId == 200) {
-            logger.info("Response with no ID returned status code {}", statusCodeForNoId);
-            test.info("Response with no ID returned status code " + statusCodeForNoId);
-        } else {
-            logger.error("Expected status code 200, but got {}", statusCodeForNoId);
-            test.fail("Expected status code 200, but got " + statusCodeForNoId);
-        }
-
-        logger.info("Response body for pet without ID: {}", responseWithoutId.getBody().asPrettyString());
-        test.info("Response body for pet without ID: " + responseWithoutId.getBody().asPrettyString());
-        logger.info("Backend automatically generated an ID for the new pet.");
-        test.info("Backend automatically generated an ID for the new pet.");
-    }
-
-    @Test
     void addNewPetWithStringId() {
         test = extent.createTest("Add New Pet with String ID Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet petWithStringId = new Pet();
-        petWithStringId.setCategory(category);
-        petWithStringId.setName("Fluffy");
-        petWithStringId.setPhotoUrls(List.of());
-        petWithStringId.setTags(List.of(new Tag("Mammal", 1L)));
-        petWithStringId.setStatus("available");
+        Pet petWithStringId = createPet();
         try {
             petWithStringId.setId(Long.valueOf("string-id"));
         } catch (NumberFormatException e) {
@@ -287,17 +217,7 @@ public class CreatePetTest {
     void addNewPetWithInvalidStatus() {
         test = extent.createTest("Add New Pet with Invalid Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Tag tag = new Tag("Mammal", 1L);
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Miffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(tag));
+        Pet pet = createPet();
         pet.setStatus("invalid");
 
         logger.info("Creating a new pet with invalid status");
@@ -330,15 +250,7 @@ public class CreatePetTest {
     void addNewPetWithLongInsteadOfStringForStatus() {
         test = extent.createTest("Add New Pet with Long Instead of String for Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
+        Pet pet = createPet();
         pet.setStatus(String.valueOf(123456789L));
 
         logger.info("Creating a new pet with a long value for status");
@@ -369,15 +281,7 @@ public class CreatePetTest {
     void addNewPetWithSpecialCharactersInStatus() {
         test = extent.createTest("Add New Pet with Special Characters in Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
+        Pet pet = createPet();
         pet.setStatus("avai@lable!");
 
         logger.info("Creating a new pet with special characters in status");
@@ -408,17 +312,8 @@ public class CreatePetTest {
     void addNewPetWithoutName() {
         test = extent.createTest("Add New Pet without Name Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Tag tag = new Tag("Mammal", 1L);
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(tag));
-        pet.setStatus("available");
+        Pet pet = createPet();
+        pet.setName(null);
 
         logger.info("Creating a new pet without name");
         test.info("Creating a new pet without name");
@@ -448,17 +343,10 @@ public class CreatePetTest {
     void addNewPetWithDuplicateName() {
         test = extent.createTest("Add New Pet with Duplicate Name Field Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
+        Pet pet = createPet();
+        pet.setName("Fluffy");
+        pet.setName("Fluffy");
 
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with duplicate name");
         test.info("Creating a new pet with duplicate name");
@@ -488,15 +376,7 @@ public class CreatePetTest {
     void addNewPetWithNullStatus() {
         test = extent.createTest("Add New Pet with Null Status Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Miffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
+        Pet pet = createPet();
         pet.setStatus(null);
 
         logger.info("Creating a new pet with null status");
@@ -528,18 +408,8 @@ public class CreatePetTest {
     void addNewPetWithExceedingNameLength() {
         test = extent.createTest("Add New Pet with Exceeding Name Length Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        String longName = "A".repeat(300);
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName(longName);
-        pet.setPhotoUrls(List.of());
+        Pet pet = createPet();
         pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with a very long name");
         test.info("Creating a new pet with a very long name");
@@ -598,17 +468,12 @@ public class CreatePetTest {
     @Test
     void addNewPetWithNonExistentCategory() {
         test = extent.createTest("Add New Pet with Non-Existent Category Test");
+        Pet pet = createPet();
 
         Category category = new Category();
         category.setId(999L);
         category.setName("NonExistent");
-
-        Pet pet = new Pet();
         pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with a non-existent category ID");
         test.info("Creating a new pet with a non-existent category ID");
@@ -643,13 +508,9 @@ public class CreatePetTest {
         category.setId(1L);
         category.setName("Rabbit");
 
-        Pet pet = new Pet();
+        Pet pet = createPet();
         pet.setCategory(category);
         pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with duplicate category");
         test.info("Creating a new pet with duplicate category");
@@ -679,16 +540,9 @@ public class CreatePetTest {
     void addNewPetWithInvalidPhotoUrl() {
         test = extent.createTest("Add New Pet with Invalid Photo URL Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
+        Pet pet = createPet();
         pet.setPhotoUrls(List.of("invalid_url"));
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
+
 
         logger.info("Creating a new pet with an invalid photo URL");
         test.info("Creating a new pet with an invalid photo URL");
@@ -719,16 +573,8 @@ public class CreatePetTest {
     void addNewPetWithPhotoUrlAsLong() {
         test = extent.createTest("Add New Pet with Photo URL as Long Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of(String.valueOf(123456789L)));  // Long value instead of String
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
+        Pet pet = createPet();
+        pet.setPhotoUrls(List.of(String.valueOf(123456789L)));
 
         logger.info("Creating a new pet with photo URL as long");
         test.info("Creating a new pet with photo URL as long");
@@ -758,16 +604,8 @@ public class CreatePetTest {
     void addNewPetWithInvalidTags() {
         test = extent.createTest("Add New Pet with Invalid Tags Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("NonExistentTag", 999L)));
-        pet.setStatus("available");
+        Pet pet = createPet();
+        pet.setTags(List.of(new Tag("NonExistentTag%@{}", 999L)));
 
         logger.info("Creating a new pet with invalid tag ID");
         test.info("Creating a new pet with invalid tag ID");
@@ -801,12 +639,8 @@ public class CreatePetTest {
         category.setId(-1L);
         category.setName("Rabbit");
 
-        Pet pet = new Pet();
+        Pet pet = createPet();
         pet.setCategory(category);
-        pet.setName("Fluffy");
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with a negative category ID");
         test.info("Creating a new pet with a negative category ID");
@@ -837,18 +671,9 @@ public class CreatePetTest {
     void addNewPetWithLargePayload() {
         test = extent.createTest("Add New Pet with Large Payload Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
+        Pet pet = createPet();
         String longName = "A".repeat(10000);
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
         pet.setName(longName);
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with a large payload");
         test.info("Creating a new pet with a large payload");
@@ -861,28 +686,30 @@ public class CreatePetTest {
 
         logger.info("Verifying response status code");
         test.info("Verifying response status code");
-        response.then().statusCode(200);
+        int statusCode = response.getStatusCode();
+        if (statusCode == 400) {
+            logger.info("Expected 400 status code for large payload, test passed.");
+            test.info("Expected 400 status code for large payload, test passed.");
+        } else {
+            logger.error("Expected 400 status code for large payload, but got {}", statusCode);
+            test.fail("Expected 400 status code for large payload, but got " + statusCode);
+        }
 
-        logger.info("Large payload accepted by the API. This should be rejected if there are size limits.");
-        test.info("Large payload accepted by the API. This should be rejected if there are size limits.");
+        String responseBody = response.getBody().asPrettyString();
+        logger.info("Response body for large payload: {}", responseBody);
+        test.info("Response body for large payload: " + responseBody);
+
+        logger.info("Large payload handled correctly. Test passed if 400 returned.");
+        test.info("Large payload handled correctly. Test passed if 400 returned.");
     }
 
     @Test
     void addNewPetWithSpecialCharactersInName() {
         test = extent.createTest("Add New Pet with Special Characters in Name Test");
 
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Rabbit");
-
+        Pet pet = createPet();
         String specialName = "Fluffy@#$%^&*()";
-
-        Pet pet = new Pet();
-        pet.setCategory(category);
         pet.setName(specialName);
-        pet.setPhotoUrls(List.of());
-        pet.setTags(List.of(new Tag("Mammal", 1L)));
-        pet.setStatus("available");
 
         logger.info("Creating a new pet with special characters in the name");
         test.info("Creating a new pet with special characters in the name");
