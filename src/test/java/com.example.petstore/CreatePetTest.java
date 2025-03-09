@@ -54,18 +54,22 @@ public class CreatePetTest {
 
         return pet;
     }
+    private Response sendPostRequest(Pet pet) {
+        return given()
+                .contentType(ContentType.JSON)
+                .header("api_key", ConfigReader.getApiKey())
+                .body(pet)
+                .when()
+                .post("/pet");
+    }
+
     @Test
     void addNewPet() {
         Pet pet = createPet();
 
         test.info("Creating a new pet with name: " + pet.getName());
         logger.info("Creating a new pet with name: {}", pet.getName());
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         test.info("Verifying response status code");
         logger.info("Verifying response status code");
@@ -99,12 +103,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with status 'sold'");
         test.info("Creating a new pet with status 'sold'");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         logger.info("Verifying response status code");
         test.info("Verifying response status code");
@@ -123,12 +122,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with status 'pending'");
         test.info("Creating a new pet with status 'pending'");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         logger.info("Verifying response status code");
         test.info("Verifying response status code");
@@ -147,12 +141,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with null ID");
         test.info("Creating a new pet with null ID");
-        Response responseWithNullId = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(petWithNullId)
-                .when()
-                .post("/pet");
+        Response responseWithNullId = sendPostRequest(petWithNullId);
 
         int statusCodeForNullId = responseWithNullId.getStatusCode();
         if (statusCodeForNullId == 405) {
@@ -191,12 +180,8 @@ public class CreatePetTest {
         }
         logger.info("Creating a new pet with string ID");
         test.info("Creating a new pet with string ID");
-        Response responseWithStringId = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(petWithStringId)
-                .when()
-                .post("/pet");
+        Response responseWithStringId = sendPostRequest(petWithStringId);
+
 
         int statusCodeForStringId = responseWithStringId.getStatusCode();
         if (statusCodeForStringId == 400) {
@@ -222,12 +207,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with invalid status");
         test.info("Creating a new pet with invalid status");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -255,12 +235,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with a long value for status");
         test.info("Creating a new pet with a long value for status");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCodeForLongStatus = response.getStatusCode();
         if (statusCodeForLongStatus == 405) {
@@ -286,12 +261,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with special characters in status");
         test.info("Creating a new pet with special characters in status");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCodeForStatus = response.getStatusCode();
         if (statusCodeForStatus == 405) {
@@ -317,12 +287,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet without name");
         test.info("Creating a new pet without name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -350,12 +315,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with duplicate name");
         test.info("Creating a new pet with duplicate name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCodeForDuplicateName = response.getStatusCode();
         if (statusCodeForDuplicateName == 400) {
@@ -381,12 +341,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with null status");
         test.info("Creating a new pet with null status");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 405) {
@@ -413,12 +368,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with a very long name");
         test.info("Creating a new pet with a very long name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 405) {
@@ -477,12 +427,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with a non-existent category ID");
         test.info("Creating a new pet with a non-existent category ID");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -514,12 +459,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with duplicate category");
         test.info("Creating a new pet with duplicate category");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCodeForDuplicateCategory = response.getStatusCode();
         if (statusCodeForDuplicateCategory == 400) {
@@ -546,12 +486,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with an invalid photo URL");
         test.info("Creating a new pet with an invalid photo URL");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -578,12 +513,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with photo URL as long");
         test.info("Creating a new pet with photo URL as long");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCodeForPhotoUrlAsLong = response.getStatusCode();
         if (statusCodeForPhotoUrlAsLong == 405) {
@@ -609,12 +539,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with invalid tag ID");
         test.info("Creating a new pet with invalid tag ID");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -644,12 +569,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with a negative category ID");
         test.info("Creating a new pet with a negative category ID");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {
@@ -677,12 +597,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with a large payload");
         test.info("Creating a new pet with a large payload");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         logger.info("Verifying response status code");
         test.info("Verifying response status code");
@@ -713,12 +628,7 @@ public class CreatePetTest {
 
         logger.info("Creating a new pet with special characters in the name");
         test.info("Creating a new pet with special characters in the name");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .post("/pet");
+        Response response = sendPostRequest(pet);
 
         int statusCode = response.getStatusCode();
         if (statusCode == 400) {

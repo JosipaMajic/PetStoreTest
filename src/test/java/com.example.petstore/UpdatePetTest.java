@@ -67,12 +67,7 @@ public class UpdatePetTest {
         Pet pet = createPet("MiffyUpdated", "sold");
 
         test.info("Updating an existing pet with name: " + pet.getName());
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
 
         logger.info("Verifying response status code");
         response.then().statusCode(200);
@@ -99,12 +94,7 @@ public class UpdatePetTest {
 
         logger.info("Updating a non-existing pet with ID: ");
         test.info("Updating a non-existing pet with ID: ");
-        Response response = given()
-                .contentType(ContentType.JSON)
-                .header("api_key", ConfigReader.getApiKey())
-                .body(pet)
-                .when()
-                .put("/pet");
+        Response response = sendPutRequest(pet);
 
         logger.info("Verifying response status code");
         test.info("Verifying response status code");
