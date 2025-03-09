@@ -150,4 +150,48 @@ public class GetPetTest {
             test.fail("Unexpected error code: " + statusCode + ". Response: " + responseBody);
         }
     }
+    @Test
+    void getPetByDecimalId() {
+        test = extent.createTest("Get Pet by Decimal ID Test");
+        double decimalId = 123.45;
+
+        test.info("Retrieving pet details by decimal ID: " + decimalId);
+        Response response = given()
+                .header("api_key", ConfigReader.getApiKey())
+                .when()
+                .get("/pet/{petId}", decimalId);
+
+        test.info("Verifying response status code");
+        int statusCode = response.getStatusCode();
+        if (statusCode == 404) {
+            test.info("Response with decimal ID returned status code " + statusCode);
+        } else {
+            test.fail("Expected status code 404 for decimal ID, but got " + statusCode);
+        }
+
+        test.info("Response body for decimal ID: " + response.getBody().asPrettyString());
+        test.info("Decimal ID was rejected as expected. It should be an integer.");
+    }
+    @Test
+    void getPetByLargeId() {
+        test = extent.createTest("Get Pet by Large ID Test");
+        long largeId = 4654546546464561443L;
+        test.info("Retrieving pet details by large ID: " + largeId);
+
+        Response response = given()
+                .header("api_key", ConfigReader.getApiKey())
+                .when()
+                .get("/pet/{petId}", largeId);
+
+        test.info("Verifying response status code");
+        int statusCode = response.getStatusCode();
+        if (statusCode == 404) {
+            test.info("Response with large ID returned status code " + statusCode);
+        } else {
+            test.fail("Expected status code 404 for large ID, but got " + statusCode);
+        }
+
+        test.info("Response body for large ID: " + response.getBody().asPrettyString());
+        test.info("Large ID was rejected as expected. It should be a valid integer.");
+    }
 }

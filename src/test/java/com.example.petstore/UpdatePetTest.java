@@ -101,8 +101,7 @@ public class UpdatePetTest {
                 .put("/pet");
 
         test.info("Verifying response status code");
-        response.then().statusCode(200); // This might not fail if the API doesn't validate IDs
-
+        response.then().statusCode(200);
         test.pass("Pet updated with invalid ID");
     }
 }
