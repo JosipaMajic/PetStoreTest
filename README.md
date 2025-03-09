@@ -96,12 +96,3 @@ mvn -Dtest=CreatePetTest,GetPetTest test
 The **config.properties** file in `src/test/resources/` contains the API base URL and other settings.  
 
 ---
-
-## ✨ Future Enhancements
-
-- Add more negative test cases
-- Improve performance testing
-- Integrate with CI/CD pipeline
-
----
-
